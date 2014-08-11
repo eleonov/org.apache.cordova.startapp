@@ -51,6 +51,8 @@ public class startApp extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("start")) {
             this.start(args, callbackContext);
+        } else if (action.equals("startGoogleChromeWithURI")) {
+            this.startGoogleChromeWithURI(args.getString(0), callbackContext);
         } else if (action.equals("check")) {
             this.check(
                 args.getString(0),
@@ -92,14 +94,12 @@ public class startApp extends CordovaPlugin {
     /**
      * Run google chrome with special uri
      */
-    public void startGoogleChromeWithURI(JSONArray args, CallbackContext callback) {
+    public void startGoogleChromeWithURI(String url, CallbackContext callback) {
         try {
             Intent LaunchIntent = this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage("com.android.chrome");
 
-            if (args.length() >= 1) {
-                Uri uri = Uri.parse("http://ya.ru");
-                LaunchIntent.setData(uri);
-            }
+            Uri uri = Uri.parse(url);
+            LaunchIntent.setData(uri);
 
             this.cordova.getActivity().startActivity(LaunchIntent);
             callback.success();

@@ -34,7 +34,7 @@ module.exports = {
     start: function(message, completeCallback, errorCallback) {
         exec(completeCallback, errorCallback, "startApp", "start", (typeof message === 'string') ? [message] : message);
     },
-    startGoogleChromeWithURI: function(message, completeCallback, errorCallback) {
-        exec(completeCallback, errorCallback, "startApp", "startGoogleChromeWithURI", (typeof message === 'string') ? [message] : message);
+    startGoogleChromeWithURI: function(uri, completeCallback, errorCallback) {
+        exec(completeCallback, errorCallback, "startApp", "startGoogleChromeWithURI", [uri]);
     }
 }
