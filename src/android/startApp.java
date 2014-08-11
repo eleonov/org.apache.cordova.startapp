@@ -28,6 +28,8 @@ import android.content.Intent;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
 
+import android.net.Uri;
+
 /**
  * This class provides access to vibration on the device.
  */
@@ -36,7 +38,7 @@ public class startApp extends CordovaPlugin {
     /**
      * Constructor.
      */
-    public startApp() { }
+    public startApp() {}
 
     /**
      * Executes the request and returns PluginResult.
@@ -49,16 +51,15 @@ public class startApp extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("start")) {
             this.start(args, callbackContext);
+        } else if (action.equals("check")) {
+            this.check(
+                args.getString(0),
+                callbackContext,
+                this.cordova.getActivity().getApplicationContext()
+            );
         }
-		else if(action.equals("check")) {
-			this.check(
-				args.getString(0), 
-				callbackContext,
-				this.cordova.getActivity().getApplicationContext()
-			);
-		}
-		
-		return true;
+
+        return true;
     }
 
     //--------------------------------------------------------------------------
@@ -68,36 +69,55 @@ public class startApp extends CordovaPlugin {
      * startApp
      */
     public void start(JSONArray args, CallbackContext callback) {
-		// args.getString(0) - com name
-		// args.getString(1) - activity
-		// args.getString(2) - key
-		// args.getString(3) - value
-		try {
-			Intent LaunchIntent = this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage(args.getString(0));
-			
-			if(args.length() > 3) {
-				ComponentName comp = new ComponentName(args.getString(0), args.getString(1));
-				LaunchIntent.setComponent(comp);
-				LaunchIntent.putExtra(args.getString(2), args.getString(3));
-			}
-			
-			this.cordova.getActivity().startActivity(LaunchIntent);
-			callback.success();
-		} catch (Exception e) {
-			callback.error(e.toString());
+        // args.getString(0) - com name
+        // args.getString(1) - activity
+        // args.getString(2) - key
+        // args.getString(3) - value
+        try {
+            Intent LaunchIntent = this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage(args.getString(0));
+
+            if (args.length() > 3) {
+                ComponentName comp = new ComponentName(args.getString(0), args.getString(1));
+                LaunchIntent.setComponent(comp);
+                LaunchIntent.putExtra(args.getString(2), args.getString(3));
+            }
+
+            this.cordova.getActivity().startActivity(LaunchIntent);
+            callback.success();
+        } catch (Exception e) {
+            callback.error(e.toString());
+        }
+    }
+
+    /**
+     * Run google chrome with special uri
+     */
+    public void startGoogleChromeWithURI(JSONArray args, CallbackContext callback) {
+        try {
+            Intent LaunchIntent = this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage("com.android.chrome");
+
+            if (args.length() >= 1) {
+                Uri uri = Uri.parse("http://ya.ru");
+                LaunchIntent.setData(uri);
+            }
+
+            this.cordova.getActivity().startActivity(LaunchIntent);
+            callback.success();
+        } catch (Exception e) {
+            callback.error(e.toString());
         }
     }
 
     /**
      * checkApp
-     */	 
-	public void check(String component, CallbackContext callback, Context context) {
-		PackageManager pm = context.getPackageManager();
-		try {
-			pm.getPackageInfo(component, PackageManager.GET_ACTIVITIES);
-			callback.success();
-		} catch (Exception e) {
-			callback.error(e.toString());
-		}
-	}
+     */
+    public void check(String component, CallbackContext callback, Context context) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(component, PackageManager.GET_ACTIVITIES);
+            callback.success();
+        } catch (Exception e) {
+            callback.error(e.toString());
+        }
+    }
 }
